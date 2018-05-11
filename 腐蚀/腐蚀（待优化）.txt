@@ -1,0 +1,67 @@
+#include<iostream>
+#include<opencv.hpp>
+using namespace cv;
+using namespace std;
+void erode1(Mat &,Mat &);
+void doublevalue(Mat &);
+int main()
+{
+	Mat in= imread("Fig0333(a)(test_pattern_blurring_orig).tif",CV_LOAD_IMAGE_GRAYSCALE);
+	imshow("dddd", in);
+	waitKey(-1);
+	doublevalue(in);
+	imshow("dddd", in);
+	waitKey(-1);
+	imwrite("二值化.jpg", in);
+	Mat in1;
+	in.copyTo(in1);
+	Mat out;
+	erode1(in,out);
+	imshow("dddff", out);
+	waitKey(-1);
+	imwrite("腐蚀.jpg", out);
+	Mat out2;
+	addWeighted(in1, 1, out, -1, 100, out2);
+	imshow("dddf", out2);
+	waitKey(-1);
+	imwrite("腐蚀得到边缘.jpg", out2);
+}
+void doublevalue(Mat & I)
+{
+uchar *p;
+for (int i = 1; i <= I.rows-1; i++)
+{
+p = I.ptr<uchar>(i);
+for (int j = 1; j <= I.cols - 1; j++)
+{
+if (p[j] >= 128)
+p[j] = 255;
+else
+p[j] = 0;
+}
+}
+}
+void erode1(Mat & I,Mat &O)
+{
+	I.copyTo(O);
+uchar *Icurrent;
+uchar *Iprevious;
+uchar *Inext;
+uchar *Ocurrent;
+for (int i = 2; i <= I.rows - 2; i++)
+{
+Icurrent = I.ptr<uchar>(i);
+Iprevious = I.ptr<uchar>(i - 1);
+Inext = I.ptr<uchar>(i + 1);
+Ocurrent = O.ptr<uchar>(i);
+for (int j = 2; j <= I.cols - 2; j++)
+{
+	if (Icurrent[j] ==0&& Icurrent[j + 1] ==0&& Icurrent[j - 1] == 0&&Iprevious[j] == 0 && Iprevious[j - 1] == 0 && Iprevious[j + 1] == 0 && Inext[j] == 0 && Inext[j + 1] == 0 && Inext[j - 1] == 0)
+	{
+		Ocurrent[j] = 0;
+	}
+else
+Ocurrent[j] = 255;
+}
+}
+}
