@@ -1,0 +1,132 @@
+#include<iostream>
+#include<opencv.hpp>
+using namespace cv;
+using namespace std;
+void fun(Mat &,Mat &);
+bool judge(Mat &);
+void doublevalue(Mat &);
+Mat erode(Mat);
+Mat dilate(Mat);
+void f(Mat,Mat ,Mat);
+int main()
+{
+	Mat in = imread("test.png",CV_LOAD_IMAGE_GRAYSCALE);
+	Mat out(in.rows,in.cols, CV_8UC1,Scalar(255));
+	doublevalue(in);
+	waitKey(-1);
+	fun(in, out);
+	imshow("ddd", out);
+	waitKey(-1);
+	imwrite("π«˜¿Ã·»°test.jpg", out);
+}
+void doublevalue(Mat & I)
+{
+	uchar *p;
+	for (int i = 1; i <= I.rows - 1; i++)
+	{
+		p = I.ptr<uchar>(i);
+		for (int j = 1; j <= I.cols - 1; j++)
+		{
+			if (p[j] >= 230)
+				p[j] = 255;
+			else
+				p[j] = 0;
+		}
+	}
+}
+Mat erode(Mat I)
+{
+	Mat O;
+	I.copyTo(O);
+	uchar *Icurrent;
+	uchar *Iprevious;
+	uchar *Inext;
+	uchar *Ocurrent;
+	for (int i = 2; i <= I.rows - 2; i++)
+	{
+		Icurrent = I.ptr<uchar>(i);
+		Iprevious = I.ptr<uchar>(i - 1);
+		Inext = I.ptr<uchar>(i + 1);
+		Ocurrent = O.ptr<uchar>(i);
+		for (int j = 2; j <= I.cols - 2; j++)
+		{
+			if (Icurrent[j] == 0 && Icurrent[j + 1] == 0 && Icurrent[j - 1] == 0 && Iprevious[j] == 0 && Iprevious[j - 1] == 0 && Iprevious[j + 1] == 0 && Inext[j] == 0 && Inext[j + 1] == 0 && Inext[j - 1] == 0)
+			{
+				Ocurrent[j] = 0;
+			}
+			else
+				Ocurrent[j] = 255;
+		}
+	}
+	return O;
+}
+Mat dilate(Mat I)
+{
+	Mat O;
+	I.copyTo(O);
+	uchar *Icurrent;
+	uchar *Iprevious;
+	uchar *Inext;
+	uchar *Ocurrent;
+	for (int i = 2; i <= I.rows - 2; i++)
+	{
+		Icurrent = I.ptr<uchar>(i);
+		Iprevious = I.ptr<uchar>(i - 1);
+		Inext = I.ptr<uchar>(i + 1);
+		Ocurrent = O.ptr<uchar>(i);
+		for (int j = 2; j <= I.cols - 2; j++)
+		{
+			if (Icurrent[j] == 0 || Icurrent[j + 1] == 0 || Icurrent[j - 1] == 0 || Iprevious[j] == 0 || Iprevious[j - 1] == 0 || Iprevious[j + 1] == 0 || Inext[j] == 0 || Inext[j + 1] == 0 || Inext[j - 1] == 0)
+			{
+				Ocurrent[j] = 0;
+			}
+			else
+				Ocurrent[j] = 255;
+		}
+	}
+	return O;
+}
+bool judge(Mat &I)
+{
+	uchar *p;
+	for (int i = 1; i < I.rows - 1; i++)
+	{
+		p = I.ptr<uchar>(i);
+		for (int j = 1; j < I.cols - 1; j++)
+		{
+			if (p[i] != 255)
+				return true;
+		}
+	}
+	return false;
+}
+void fun(Mat &I,Mat& out)
+{
+	Mat O(I.rows, I.cols, CV_8UC1, Scalar(255));
+	Mat out1(I.rows, I.cols, CV_8UC1, Scalar(255));
+	uchar *p;
+	Mat a;
+	for (int i = 0; judge(I)&&i<100; i++)
+	{
+		I = erode(I);
+		f(I, dilate(erode(I)), O);
+		f(O, out1, out);
+	}
+}
+void f(Mat I1, Mat I2, Mat O)
+{
+	uchar *p1;
+	uchar *p2;
+	uchar *q;
+	for (int i = 1; i < I1.rows - 1; i++)
+	{
+		p1 = I1.ptr<uchar>(i);
+		p2 = I2.ptr<uchar>(i);
+		q = O.ptr<uchar>(i);
+		for (int j = 1; j < I1.cols - 1; j++)
+		{
+			if (p1[j] == 0 && p2[j] == 255)
+				q[j] = 0;
+		}
+	}
+}
